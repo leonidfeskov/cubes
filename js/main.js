@@ -23,7 +23,18 @@
     ctx.strokeStyle = '#212121';
     ctx.lineWidth = 1;
 
+    function Cell() {
+        this.top = false;
+        this.bottom = false;
+        this.diagonal = false;
+    }
+
+    var userImage = {
+        cells: []
+    }
+
     // рисуем сетку
+    // горизонтальные линии
     ctxGrid.beginPath();
     var i = 0;
     while (cellSize * i <= height) {
@@ -32,6 +43,7 @@
         i++;
     }
 
+    // вертикальные линии
     var j = 0;
     while (cellSize * j <= width) {
         ctxGrid.moveTo(cellSize * j, 0);
@@ -92,6 +104,10 @@
         ctx.stroke();
     }
 
+    function clearCell(cellNumber) {
+        ctx.clearRect(cellNumber.coordX - 1, cellNumber.coordY - 1, cellSize + 2, cellSize + 2);
+    }
+
     document.addEventListener('click', function(event) {
         var x = event.clientX;
         var y = event.clientY;
@@ -102,7 +118,10 @@
         var deltaX = x - cellNumber.coordX;
         var deltaY = y - cellNumber.coordY;
 
-        console.log(deltaX, deltaY);
+        if (event.ctrlKey) {
+            clearCell(cellNumber);
+            return;
+        }
 
         if (deltaX <= deviation) {
             drawLeft(cellNumber);
