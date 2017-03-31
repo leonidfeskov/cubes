@@ -12,3 +12,11 @@ body {
     left: 0;
     top: 0;
 }
+
+.controls {
+    background: #333333;
+    padding: 20px;
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+}
