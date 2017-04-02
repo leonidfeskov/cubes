@@ -235,6 +235,12 @@
             var cellCoords = getCellCoords(x, y);
             var cell = notebook.data[cellCoords.y][cellCoords.x];
 
+            // стираем всю клетку
+            if (event.altKey) {
+                notebook.removeCell(cellCoords);
+                return;
+            }
+
             switch (currentCell.strokeType) {
                 case 'top':
                     if (!cell.top) {
