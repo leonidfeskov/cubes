@@ -4,10 +4,13 @@ body {
     background: #fff;
     font-family: Arial, Helvetica, sans-serif;
     color: #333;
-    overflow: hidden;
 }
 
-.canvas {
+.canvas-wrapper {
+    position: relative;
+}
+
+.canvas-draw {
     position: absolute;
     left: 0;
     top: 0;
@@ -17,8 +20,6 @@ body {
     background: #333333;
     padding: 20px;
     box-sizing: border-box;
-    position: absolute;
-    width: 100%;
 }
 
 .console {

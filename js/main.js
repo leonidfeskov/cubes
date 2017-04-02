@@ -2,12 +2,13 @@
     'use strict';
 
     var CELL_SIZE = 30;
+    var VERTICAL_CELLS_COUNT = 40;
     var DIVIATION = Math.round(CELL_SIZE / 5);
     var COLOR_GRID = '#EEEEEE';
     var COLOR_STROKE = '#212121';
 
     var width = window.innerWidth;
-    var height = window.innerHeight;
+    var height = CELL_SIZE * VERTICAL_CELLS_COUNT;
 
     var cellsCountByX = Math.floor(width / CELL_SIZE) + 1;
     var cellsCountByY = Math.floor(height / CELL_SIZE) + 1;
@@ -164,6 +165,14 @@
         }
     }
 
+    function getOffset(element) {
+        var box = element.getBoundingClientRect();
+        return {
+            top: box.top + pageYOffset,
+            left: box.left + pageXOffset
+        };
+    }
+
     // Если что-то уже есть в localStorage, рисуем оттуда
     if (localStorage.getItem('notebookData')) {
         drawFromStorage();
@@ -173,12 +182,13 @@
 
     var currentCell = {};
     var isDrawProcess = false;
+    var canvasOffset = getOffset(canvas);
 
     canvas.addEventListener('mousedown', function(event) {
         isDrawProcess = true;
 
-        var x = event.clientX;
-        var y = event.clientY;
+        var x = event.pageX - canvasOffset.left;
+        var y = event.pageY - canvasOffset.top;
 
         var cellCoords = getCellCoords(x, y);
 
@@ -229,8 +239,8 @@
 
     canvas.addEventListener('mousemove', function(event) {
         if (isDrawProcess) {
-            var x = event.clientX;
-            var y = event.clientY;
+            var x = event.pageX - canvasOffset.left;
+            var y = event.pageY - canvasOffset.top;
 
             var cellCoords = getCellCoords(x, y);
             var cell = notebook.data[cellCoords.y][cellCoords.x];
