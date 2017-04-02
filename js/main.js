@@ -47,11 +47,12 @@
             var x = cellCoords.x;
             var y = cellCoords.y;
 
-            this.data[y][x][strokeType] = true;
+            if (!this.data[y][x][strokeType]) {
+                this.data[y][x][strokeType] = true;
+                this.syncWithStorage();
+                drawStroke(cellCoords, strokeType);
+            }
 
-            this.syncWithStorage();
-
-            drawStroke(cellCoords, strokeType);
         };
 
         this.removeCell = function(cellCoords) {
@@ -183,8 +184,10 @@
 
         // координаты клика относительно текущей ячейки
         // по ним определяем какую именно сторону ячейки пользователь хочет нарисовать
-        var deltaX = x - (cellCoords.x * CELL_SIZE);
-        var deltaY = y - (cellCoords.y * CELL_SIZE);
+        var distanceToTop = y - (cellCoords.y * CELL_SIZE);
+        var distanceToBottom = ((cellCoords.y + 1) * CELL_SIZE) - y;
+        var distanceToLeft = x - (cellCoords.x * CELL_SIZE);
+        var distanceToRight = ((cellCoords.x + 1) * CELL_SIZE) - x;
 
         // стираем всю клетку
         if (event.altKey) {
@@ -192,21 +195,26 @@
             return;
         }
 
-        if (deltaY <= DIVIATION) {
+        // рисуем необходимую линиию в зависимости от того к какой стороне ячейки кликнули ближе
+        if (distanceToTop <= DIVIATION && distanceToTop <= distanceToLeft && distanceToTop < distanceToRight) {
             notebook.addStroke(cellCoords, 'top');
             currentCell.strokeType = 'top';
-        } else if (deltaX <= DIVIATION) {
-            notebook.addStroke(cellCoords, 'left');
-            currentCell.strokeType = 'left';
-        } else if (deltaY >= CELL_SIZE - DIVIATION) {
-            cellCoords.y += 1;
-            notebook.addStroke(cellCoords, 'top');
-            currentCell.strokeType = 'top';
-        } else if (deltaX >= CELL_SIZE - DIVIATION) {
+        }
+        else if (distanceToRight <= DIVIATION && distanceToRight <= distanceToTop && distanceToRight < distanceToBottom) {
             cellCoords.x += 1;
             notebook.addStroke(cellCoords, 'left');
             currentCell.strokeType = 'left';
-        } else {
+        }
+        else if (distanceToBottom <= DIVIATION && distanceToBottom <= distanceToRight && distanceToBottom < distanceToLeft) {
+            cellCoords.y += 1;
+            notebook.addStroke(cellCoords, 'top');
+            currentCell.strokeType = 'top';
+        }
+        else if (distanceToLeft <= DIVIATION && distanceToLeft <= distanceToBottom && distanceToLeft < distanceToTop) {
+            notebook.addStroke(cellCoords, 'left');
+            currentCell.strokeType = 'left';
+        }
+        else {
             notebook.addStroke(cellCoords, 'diagonal');
             currentCell.strokeType = 'diagonal';
         }
