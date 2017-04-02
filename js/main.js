@@ -6,14 +6,71 @@
     var COLOR_GRID = '#EEEEEE';
     var COLOR_STROKE = '#212121';
 
-
     var width = window.innerWidth;
     var height = window.innerHeight;
 
-    var canvasGrid = document.getElementById('cubes-grid');
-    var ctxGrid = canvasGrid.getContext('2d');
+    var cellsCountByX = Math.floor(width / CELL_SIZE) + 1;
+    var cellsCountByY = Math.floor(height / CELL_SIZE) + 1;
 
+    var canvasGrid = document.getElementById('cubes-grid');
     var canvas = document.getElementById('cubes-canvas');
+    var buttonClearAll = document.querySelector('.js-clear-all');
+    var buttonSaveImage = document.querySelector('.js-save-image');
+    var consoleNode = document.querySelector('.js-console');
+
+    var Cell = function() {
+        return {
+            top: null,
+            left: null,
+            diagonal: null
+        };
+    };
+
+    var Notebook = function() {
+        this.data = [];
+
+        // создаем пустой
+        this.createEmptyNotebook = function() {
+            for (var i = 0; i < cellsCountByY; i++) {
+                this.data[i] = [];
+                for (var j = 0; j < cellsCountByX; j++) {
+                    this.data[i][j] = new Cell();
+                }
+            }
+        }
+
+        this.syncWithStorage = function() {
+            localStorage.setItem('notebookData', JSON.stringify(this.data));
+        };
+
+        this.addStroke = function(cellCoords, strokeType) {
+            var x = cellCoords.x;
+            var y = cellCoords.y;
+
+            this.data[y][x][strokeType] = true;
+
+            this.syncWithStorage();
+
+            drawStroke(cellCoords, strokeType);
+        };
+
+        this.removeCell = function(cellCoords) {
+            var x = cellCoords.x;
+            var y = cellCoords.y;
+
+            this.data[y][x] = new Cell();
+            this.data[y + 1][x].top = null;
+            this.data[y][x + 1].left = null;
+
+            this.syncWithStorage();
+
+            clearCell(cellCoords);
+        };
+    };
+
+    var notebook = new Notebook();
+
+    var ctxGrid = canvasGrid.getContext('2d');
     var ctx = canvas.getContext('2d');
 
     canvas.width = canvasGrid.width = width;
@@ -22,35 +79,8 @@
     ctxGrid.strokeStyle = COLOR_GRID;
     ctx.strokeStyle = COLOR_STROKE;
 
-    var cellsCountByX = Math.floor(width / CELL_SIZE) + 1;
-    var cellsCountByY = Math.floor(height / CELL_SIZE) + 2;
-
-
-    // Здесь храним рисунок
-    // userImage.cells - двумерный массив всех клеток. Каждая клетка содержит в себе информацию о нарисованном штрихе
-    // Чтобы общая грань двух соседних клеток не рисовалась дважды, рисуем только левую, верхнюю и диагональную линии для каждой клетки
-    var userImage;
-    if (localStorage.getItem('userImage')) {
-        drawFromStorage();
-    } else {
-        createEmptyUserImage();
-    }
-
-    function createEmptyUserImage() {
-        userImage = {
-            cells: []
-        };
-
-        for (var i = 0; i < cellsCountByY; i++) {
-            userImage.cells[i] = [];
-            for (var j = 0; j < cellsCountByX; j++) {
-                userImage.cells[i][j] = null;
-            }
-        }
-    }
-
-    // рисуем сетку
-    function drawGrid() {
+    // рисуем сетку на нижнем холсте
+    (function drawGrid() {
         // горизонтальные линии
         ctxGrid.beginPath();
         var i = 0;
@@ -69,163 +99,184 @@
         }
         ctxGrid.closePath();
         ctxGrid.stroke();
-    }
+    })();
 
-    drawGrid();
-
-    function getCellNumber(x, y) {
-        var posX = Math.floor(x / CELL_SIZE);
-        var posY = Math.floor(y / CELL_SIZE);
+    function getCellCoords(x, y) {
         return {
-            x: posX,
-            y: posY,
-            coordX: posX * CELL_SIZE,
-            coordY: posY * CELL_SIZE
+            x: Math.floor(x / CELL_SIZE),
+            y: Math.floor(y / CELL_SIZE)
         }
     }
 
-    function addStrokeToStorage(cellNumber, strokeName) {
-        var cell = userImage.cells[cellNumber.y][cellNumber.x];
-        if (cell === null) {
-            userImage.cells[cellNumber.y][cellNumber.x] = {};
-        }
-        userImage.cells[cellNumber.y][cellNumber.x][strokeName] = true;
-
-        localStorage.setItem('userImage', JSON.stringify(userImage));
-    }
-
-    function clearCellInStorage(cellNumber) {
-        userImage.cells[cellNumber.y][cellNumber.x] = null;
-        var siblingRightCell = userImage.cells[cellNumber.y][cellNumber.x + 1];
-        var siblingBottomCell = userImage.cells[cellNumber.y + 1][cellNumber.x];
-
-        if (siblingRightCell !== null) {
-            delete userImage.cells[cellNumber.y][cellNumber.x + 1].left;
-            if (!siblingRightCell.top && !siblingRightCell.diagonal) {
-                userImage.cells[cellNumber.y][cellNumber.x + 1] = null;
-            }
-        }
-
-        if (siblingBottomCell !== null) {
-            delete userImage.cells[cellNumber.y + 1][cellNumber.x].top;
-            if (!siblingBottomCell.left && !siblingBottomCell.diagonal) {
-                userImage.cells[cellNumber.y + 1][cellNumber.x] = null;
-            }
-        }
-
-        localStorage.setItem('userImage', JSON.stringify(userImage));
-    }
-
-    function drawDiagonal(cellNumber, save) {
+    function drawStroke(cellCoords, strokeType) {
         ctx.beginPath();
-        ctx.moveTo(CELL_SIZE * cellNumber.x, CELL_SIZE * (cellNumber.y + 1));
-        ctx.lineTo(CELL_SIZE * (cellNumber.x + 1), CELL_SIZE * cellNumber.y);
+
+        switch (strokeType) {
+            case 'top':
+                ctx.moveTo(CELL_SIZE * cellCoords.x, CELL_SIZE * cellCoords.y);
+                ctx.lineTo(CELL_SIZE * (cellCoords.x + 1), CELL_SIZE * cellCoords.y);
+                break;
+            case 'left':
+                ctx.moveTo(CELL_SIZE * cellCoords.x, CELL_SIZE * cellCoords.y);
+                ctx.lineTo(CELL_SIZE * cellCoords.x, CELL_SIZE * (cellCoords.y + 1));
+                break;
+            case 'diagonal':
+                ctx.moveTo(CELL_SIZE * cellCoords.x, CELL_SIZE * (cellCoords.y + 1));
+                ctx.lineTo(CELL_SIZE * (cellCoords.x + 1), CELL_SIZE * cellCoords.y);
+                break;
+            default:
+                break;
+        }
+        
         ctx.closePath();
         ctx.stroke();
-        if (save) {
-            addStrokeToStorage(cellNumber, 'diagonal');
-        }
     }
 
-    function drawTop(cellNumber, save) {
-        ctx.beginPath();
-        ctx.moveTo(CELL_SIZE * cellNumber.x, CELL_SIZE * cellNumber.y);
-        ctx.lineTo(CELL_SIZE * (cellNumber.x + 1), CELL_SIZE * cellNumber.y);
-        ctx.closePath();
-        ctx.stroke();
-        if (save) {
-            addStrokeToStorage(cellNumber, 'top');
-        }
+    function clearCell(cellCoords) {
+        var cellPositionX = cellCoords.x * CELL_SIZE;
+        var cellPositionY = cellCoords.y * CELL_SIZE;
+
+        ctx.clearRect(cellPositionX - 1, cellPositionY - 1, CELL_SIZE + 2, CELL_SIZE + 2);
     }
 
-    function drawLeft(cellNumber, save) {
-        ctx.beginPath();
-        ctx.moveTo(CELL_SIZE * cellNumber.x, CELL_SIZE * cellNumber.y);
-        ctx.lineTo(CELL_SIZE * cellNumber.x, CELL_SIZE * (cellNumber.y + 1));
-        ctx.closePath();
-        ctx.stroke();
-        if (save) {
-            addStrokeToStorage(cellNumber, 'left');
-        }
-    }
+    function drawFromStorage() {
+        notebook.data = JSON.parse(localStorage.getItem('notebookData'));
 
-    function clearCell(cellNumber) {
-        ctx.clearRect(cellNumber.coordX - 1, cellNumber.coordY - 1, CELL_SIZE + 2, CELL_SIZE + 2);
-        clearCellInStorage(cellNumber);
-    }
-
-    function drawFromStorage () {
-        userImage = JSON.parse(localStorage.getItem('userImage'));
-        for (var i = 0; i < userImage.cells.length; i++) {
-            var row = userImage.cells[i];
+        for (var i = 0; i < notebook.data.length; i++) {
+            var row = notebook.data[i];
             for (var j = 0; j < row.length; j++) {
                 var cell = row[j];
-                var cellNumber = {
+                var cellCoords = {
                     x: j,
-                    y: i,
-                    coordX: j * CELL_SIZE,
-                    coordY: i * CELL_SIZE
+                    y: i
                 };
-                if (cell === null) {
-                    continue;
+                if (cell.top) {
+                    drawStroke(cellCoords, 'top');
                 }
                 if (cell.left) {
-                    drawLeft(cellNumber, false);
-                }
-                if (cell.top) {
-                    drawTop(cellNumber, false);
+                    drawStroke(cellCoords, 'left');
                 }
                 if (cell.diagonal) {
-                    drawDiagonal(cellNumber, false);
+                    drawStroke(cellCoords, 'diagonal');
                 }
             }
         }
-
     }
 
-    canvas.addEventListener('click', function(event) {
+    // Если что-то уже есть в localStorage, рисуем оттуда
+    if (localStorage.getItem('notebookData')) {
+        drawFromStorage();
+    } else {
+        notebook.createEmptyNotebook();
+    }
+
+    var currentCell = {};
+    var isDrawProcess = false;
+
+    canvas.addEventListener('mousedown', function(event) {
+        isDrawProcess = true;
+
         var x = event.clientX;
         var y = event.clientY;
 
-        var cellNumber = getCellNumber(x, y);
+        var cellCoords = getCellCoords(x, y);
 
         // координаты клика относительно текущей ячейки
-        var deltaX = x - cellNumber.coordX;
-        var deltaY = y - cellNumber.coordY;
+        // по ним определяем какую именно сторону ячейки пользователь хочет нарисовать
+        var deltaX = x - (cellCoords.x * CELL_SIZE);
+        var deltaY = y - (cellCoords.y * CELL_SIZE);
 
+        // стираем всю клетку
         if (event.altKey) {
-            clearCell(cellNumber);
+            notebook.removeCell(cellCoords);
             return;
         }
 
-        if (deltaX <= DIVIATION) {
-            drawLeft(cellNumber, true);
-        } else if (deltaY <= DIVIATION) {
-            drawTop(cellNumber, true);
-        } else if (deltaX >= CELL_SIZE - DIVIATION) {
-            cellNumber.x += 1;
-            cellNumber.coordX += CELL_SIZE;
-            drawLeft(cellNumber, true);
+        if (deltaY <= DIVIATION) {
+            notebook.addStroke(cellCoords, 'top');
+            currentCell.strokeType = 'top';
+        } else if (deltaX <= DIVIATION) {
+            notebook.addStroke(cellCoords, 'left');
+            currentCell.strokeType = 'left';
         } else if (deltaY >= CELL_SIZE - DIVIATION) {
-            cellNumber.y += 1;
-            cellNumber.coordY += CELL_SIZE;
-            drawTop(cellNumber, true);
+            cellCoords.y += 1;
+            notebook.addStroke(cellCoords, 'top');
+            currentCell.strokeType = 'top';
+        } else if (deltaX >= CELL_SIZE - DIVIATION) {
+            cellCoords.x += 1;
+            notebook.addStroke(cellCoords, 'left');
+            currentCell.strokeType = 'left';
         } else {
-            drawDiagonal(cellNumber, true);
+            notebook.addStroke(cellCoords, 'diagonal');
+            currentCell.strokeType = 'diagonal';
+        }
+
+        // запоминаем информацию о ячейке, в которой произошло событие mousedown
+        // необходимо для рисования длинных линии по протягиванию мыши
+        currentCell.coords = {
+            x: cellCoords.x,
+            y: cellCoords.y
         }
     });
 
-    var buttonClearAll = document.querySelector('.js-clear-all');
-    var buttonSaveImage = document.querySelector('.js-save-image');
+    canvas.addEventListener('mousemove', function(event) {
+        if (isDrawProcess) {
+            var x = event.clientX;
+            var y = event.clientY;
+
+            var cellCoords = getCellCoords(x, y);
+            var cell = notebook.data[cellCoords.y][cellCoords.x];
+
+            switch (currentCell.strokeType) {
+                case 'top':
+                    if (!cell.top) {
+                        cellCoords.y = currentCell.coords.y;
+                        notebook.addStroke(cellCoords, 'top');
+                    }
+                    break;
+                case 'left':
+                    if (!cell.left) {
+                        cellCoords.x = currentCell.coords.x;
+                        notebook.addStroke(cellCoords, 'left');
+                    }
+                    break;
+                case 'diagonal':
+                    if (!cell.diagonal) {
+                        var deltaX = cellCoords.x - currentCell.coords.x;
+                        var deltaY = cellCoords.y - currentCell.coords.y;
+
+                        if (deltaX > 0 && deltaY < 0) {
+                            cellCoords.x = currentCell.coords.x - Math.min(deltaX, deltaY);
+                            cellCoords.y = currentCell.coords.y + Math.min(deltaX, deltaY);
+                            notebook.addStroke(cellCoords, 'diagonal');
+                        }
+
+                        if (deltaX < 0 && deltaY > 0) {
+                            cellCoords.x = currentCell.coords.x + Math.min(deltaX, deltaY);
+                            cellCoords.y = currentCell.coords.y - Math.min(deltaX, deltaY);
+                            notebook.addStroke(cellCoords, 'diagonal');
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        isDrawProcess = false;
+    });
 
     buttonClearAll.addEventListener('click', function() {
         ctx.clearRect(0, 0, width, height);
         localStorage.clear();
-        createEmptyUserImage();
+        notebook.createEmptyNotebook();
     });
 
     buttonSaveImage.addEventListener('click', function() {
         var dataURL = canvas.toDataURL();
         window.open(dataURL);
     });
+
 })();
