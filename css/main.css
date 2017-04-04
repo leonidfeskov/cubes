@@ -16,8 +16,19 @@ body {
     top: 0;
 }
 
+.canvas-pick-area {
+    background-color: #29B6F6;
+    border: 2px solid #0277BD;
+    opacity: 0.4;
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: none;
+    z-index: -1;
+}
+
 .controls {
-    background: #333333;
+    background: #01579B;
     padding: 20px;
     box-sizing: border-box;
 }
@@ -32,4 +43,29 @@ body {
     box-sizing: border-box;
     padding: 10px;
     border-top: 1px solid;
+}
+
+.button {
+    background: #ECEFF1;
+    border: medium none;
+    border-radius: 2px;
+    box-sizing: border-box;
+    padding: 0 10px;
+    height: 24px;
+    font: 14px/1.2 Arial, sans-serif;
+    color: #333333;
+    text-align: center;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #CFD8DC;
+}
+
+.button:focus {
+    outline: none;
+}
+
+.button_pressed {
+    color: #B71C1C;
 }

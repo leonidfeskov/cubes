@@ -6,16 +6,18 @@
         <link rel="stylesheet" href="css/main.css">
     </head>
     <body>
-        <div class="controls">
-            <button class="js-clear-all">Clear all</button>
-            <button class="js-save-image">Save image</button>
+        <div class="controls js-controls">
+            <button class="button js-mode" data-mode="pick">Pick mode</button>
+            <button class="button js-clear-all">Clear all</button>
+            <button class="button js-save-image">Save image</button>
         </div>
         <div class="canvas-wrapper">
             <canvas id="cubes-grid" class="canvas-grid"></canvas>
             <canvas id="cubes-canvas" class="canvas-draw"></canvas>
+            <div class="canvas-pick-area js-pick-area"></div>
         </div>
         
-        <!--div class="console js-console"></div-->
+        <div class="console js-console"></div>
         <script src="js/main.js"></script>
     </body>
 </html>
