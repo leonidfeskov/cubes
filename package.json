@@ -1,0 +1,25 @@
+{
+  "name": "cubes",
+  "version": "1.0.0",
+  "description": "Можно порисовать [Demo](https://leonidfeskov.github.io/cubes/index.html)",
+  "main": "bundle.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leonidfeskov/cubes.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leonidfeskov/cubes/issues"
+  },
+  "homepage": "https://github.com/leonidfeskov/cubes#readme",
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.1",
+    "webpack": "^2.3.3"
+  }
+}
