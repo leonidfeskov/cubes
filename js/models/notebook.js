@@ -71,6 +71,34 @@ export default class Notebook {
         redrawAll(this.data);
     }
 
+    clearArea(selectedArea) {
+        let {x1, y1, x2, y2} = selectedArea;
+
+        for (let i = y1; i <= y2 + 1; i++) {
+            for (let j = x1; j <= x2 + 1; j++) {
+                if (i < y2 + 1 && j < x2 + 1) {
+                    this.data[i][j] = new Cell();
+                    continue;
+                }
+
+                if (i === y2 + 1 && j === x2 + 1) {
+                    continue;
+                }
+
+                if (i === y2 + 1) {
+                    this.data[i][j].top = null;
+                }
+
+                if (j === x2 + 1) {
+                    this.data[i][j].left = null;
+                }
+            }
+        }
+
+        this.syncWithStorage();
+        redrawAll(this.data);
+    }
+
     copy() {
         let dx = Math.abs(this.selectedArea.x2 - this.selectedArea.x1 + 1);
         let dy = Math.abs(this.selectedArea.y2 - this.selectedArea.y1 + 1);
@@ -83,19 +111,28 @@ export default class Notebook {
                     continue;
                 }
 
+                if (i === dy && j === dx) {
+                    continue;
+                }
+
                 if (i === dy) {
                     this.buffer[i][j] = {
                         top: this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j].top
-                    }
+                    };
                 }
 
                 if (j === dx) {
                     this.buffer[i][j] = {
                         left: this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j].left
-                    }
+                    };
                 }
             }
         }
+    }
+
+    cut() {
+        this.copy();
+        this.clearArea(this.selectedArea);
     }
 
     paste() {
@@ -111,7 +148,12 @@ export default class Notebook {
                         top: cell.top,
                         left: cell.left,
                         diagonal: cell.diagonal
-                    }
+                    };
+                    continue;
+                }
+
+                if (i === height - 1 && j === width - 1) {
+                    continue;
                 }
 
                 if (i === height - 1) {

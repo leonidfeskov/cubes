@@ -125,6 +125,9 @@ document.addEventListener('keydown', function(event) {
         if (event.keyCode === KEY_CODES.c) {
             notebook.copy();
         }
+        if (event.keyCode === KEY_CODES.x) {
+            notebook.cut();
+        }
         if (event.keyCode === KEY_CODES.v) {
             notebook.paste();
         }

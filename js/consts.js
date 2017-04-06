@@ -16,5 +16,6 @@ export const KEY_CODES = {
     ctrl: 17,
     cmd: 91,
     c: 67,
-    v: 86
+    v: 86,
+    x: 88
 };

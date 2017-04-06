@@ -109,7 +109,8 @@ const KEY_CODES = {
     ctrl: 17,
     cmd: 91,
     c: 67,
-    v: 86
+    v: 86,
+    x: 88
 };
 /* harmony export (immutable) */ __webpack_exports__["c"] = KEY_CODES;
 
@@ -518,6 +519,34 @@ class Notebook {
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__draw__["c" /* redrawAll */])(this.data);
     }
 
+    clearArea(selectedArea) {
+        let { x1, y1, x2, y2 } = selectedArea;
+
+        for (let i = y1; i <= y2 + 1; i++) {
+            for (let j = x1; j <= x2 + 1; j++) {
+                if (i < y2 + 1 && j < x2 + 1) {
+                    this.data[i][j] = new Cell();
+                    continue;
+                }
+
+                if (i === y2 + 1 && j === x2 + 1) {
+                    continue;
+                }
+
+                if (i === y2 + 1) {
+                    this.data[i][j].top = null;
+                }
+
+                if (j === x2 + 1) {
+                    this.data[i][j].left = null;
+                }
+            }
+        }
+
+        this.syncWithStorage();
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__draw__["c" /* redrawAll */])(this.data);
+    }
+
     copy() {
         let dx = Math.abs(this.selectedArea.x2 - this.selectedArea.x1 + 1);
         let dy = Math.abs(this.selectedArea.y2 - this.selectedArea.y1 + 1);
@@ -527,6 +556,10 @@ class Notebook {
             for (let j = 0; j <= dx; j++) {
                 if (i < dy && j < dx) {
                     this.buffer[i][j] = this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j];
+                    continue;
+                }
+
+                if (i === dy && j === dx) {
                     continue;
                 }
 
@@ -545,6 +578,11 @@ class Notebook {
         }
     }
 
+    cut() {
+        this.copy();
+        this.clearArea(this.selectedArea);
+    }
+
     paste() {
         let height = this.buffer.length;
         let width = this.buffer[0].length;
@@ -559,6 +597,11 @@ class Notebook {
                         left: cell.left,
                         diagonal: cell.diagonal
                     };
+                    continue;
+                }
+
+                if (i === height - 1 && j === width - 1) {
+                    continue;
                 }
 
                 if (i === height - 1) {
@@ -718,6 +761,9 @@ document.addEventListener('keydown', function (event) {
 
         if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* KEY_CODES */].c) {
             notebook.copy();
+        }
+        if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* KEY_CODES */].x) {
+            notebook.cut();
         }
         if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* KEY_CODES */].v) {
             notebook.paste();
