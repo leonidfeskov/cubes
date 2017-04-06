@@ -1,5 +1,6 @@
 import { CELL_SIZE, WIDTH, HEIGHT, COLOR_GRID, COLOR_STROKE, CELLS_COUNT_BY_X, CELLS_COUNT_BY_Y } from './consts';
 
+
 let canvasGrid = document.getElementById('cubes-grid');
 let canvas = document.getElementById('cubes-canvas');
 
@@ -15,7 +16,7 @@ ctx.strokeStyle = COLOR_STROKE;
 export function drawGrid() {
     // горизонтальные линии
     ctxGrid.beginPath();
-    var i = 0;
+    let i = 0;
     while (CELL_SIZE * i <= HEIGHT) {
         ctxGrid.moveTo(0, CELL_SIZE * i);
         ctxGrid.lineTo(WIDTH, CELL_SIZE * i);
@@ -23,7 +24,7 @@ export function drawGrid() {
     }
 
     // вертикальные линии
-    var j = 0;
+    let j = 0;
     while (CELL_SIZE * j <= WIDTH) {
         ctxGrid.moveTo(CELL_SIZE * j, 0);
         ctxGrid.lineTo(CELL_SIZE * j, HEIGHT);
@@ -64,10 +65,10 @@ export function clearAll() {
 export function redrawAll(data) {
     clearAll();
 
-    for (var i = 0; i < CELLS_COUNT_BY_Y; i++) {
-        for (var j = 0; j < CELLS_COUNT_BY_X; j++) {
-            var cell = data[i][j];
-            var cellCoords = {
+    for (let i = 0; i < CELLS_COUNT_BY_Y; i++) {
+        for (let j = 0; j < CELLS_COUNT_BY_X; j++) {
+            let cell = data[i][j];
+            let cellCoords = {
                 x: j,
                 y: i
             };

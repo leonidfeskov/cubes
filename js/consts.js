@@ -9,8 +9,8 @@ export const HEIGHT = CELL_SIZE * CELLS_COUNT_BY_Y;
 export const COLOR_GRID = '#EEEEEE';
 export const COLOR_STROKE = '#212121';
 
-export const MODE_DRAW = 'draw';
-export const MODE_PICK = 'pick';
+export const MODE_DRAW = 'DRAW';
+export const MODE_PICK = 'PICK';
 
 export const KEY_CODES = {
     ctrl: 17,
