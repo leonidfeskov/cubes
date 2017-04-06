@@ -17,6 +17,7 @@ body {
 }
 
 .canvas-pick-area {
+    box-sizing: border-box;
     background-color: #29B6F6;
     border: 2px solid #0277BD;
     opacity: 0.4;

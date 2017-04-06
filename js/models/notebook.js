@@ -19,10 +19,10 @@ export default class Notebook {
         this.targetCell = {x: 0, y: 0};
 
         this.selectedArea = {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0
+            x1: 0,
+            y1: 0,
+            x2: 0,
+            y2: 0
         };
 
         this.mode = MODE_DRAW;
@@ -72,13 +72,28 @@ export default class Notebook {
     }
 
     copy() {
-        let dx = Math.abs(this.selectedArea.x2 - this.selectedArea.x1);
-        let dy = Math.abs(this.selectedArea.y2 - this.selectedArea.y1);
+        let dx = Math.abs(this.selectedArea.x2 - this.selectedArea.x1 + 1);
+        let dy = Math.abs(this.selectedArea.y2 - this.selectedArea.y1 + 1);
 
         for (let i = 0; i <= dy; i++) {
             this.buffer[i] = [];
             for (let j = 0; j <= dx; j++) {
-                this.buffer[i][j] = this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j];
+                if (i < dy && j < dx) {
+                    this.buffer[i][j] = this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j];
+                    continue;
+                }
+
+                if (i === dy) {
+                    this.buffer[i][j] = {
+                        top: this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j].top
+                    }
+                }
+
+                if (j === dx) {
+                    this.buffer[i][j] = {
+                        left: this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j].left
+                    }
+                }
             }
         }
     }
@@ -90,10 +105,25 @@ export default class Notebook {
         for (let i = 0; i < height; i++) {
             for (let j = 0; j < width; j++) {
                 let cell = this.buffer[i][j];
-                this.data[this.targetCell.y + i][this.targetCell.x + j] = {
-                    top: cell.top,
-                    left: cell.left,
-                    diagonal: cell.diagonal
+
+                if (i < height - 1 && j < width - 1) {
+                    this.data[this.targetCell.y + i][this.targetCell.x + j] = {
+                        top: cell.top,
+                        left: cell.left,
+                        diagonal: cell.diagonal
+                    }
+                }
+
+                if (i === height - 1) {
+                    if (cell.top) {
+                        this.data[this.targetCell.y + i][this.targetCell.x + j].top = cell.top;
+                    }
+                }
+
+                if (j === width - 1) {
+                    if (cell.left) {
+                        this.data[this.targetCell.y + i][this.targetCell.x + j].left = cell.left;
+                    }
                 }
             }
         }

@@ -1,17 +1,19 @@
+import { CELL_SIZE } from '../consts';
 import { getCellCoords } from '../utils/utils';
 
 
 let pickAreaNode = document.querySelector('.js-pick-area');
 
 export default class ActionsPickMode {
-    constructor(notebook) {
-        this.notebook = notebook;
+    constructor() {
         this.process = false;
-        this.coords = {};
-        this.cellCoords = {};
+        this.coordsClick = {};
+        this.area = {};
     }
     
-    mousedown(x, y) {
+    mousedown(x, y, event) {
+        event.preventDefault();
+
         this.process = true;
 
         pickAreaNode.style.display = 'none';
@@ -21,21 +23,21 @@ export default class ActionsPickMode {
         pickAreaNode.style.top = y + 'px';
 
         // запоминаем координаты, где произошло событие mousedown
-        this.coords = {
+        this.coordsClick = {
             x: x,
             y: y
         };
 
         let cellCoords = getCellCoords(x, y);
 
-        this.cellCoords.x1 = cellCoords.x;
-        this.cellCoords.y1 = cellCoords.y;
+        this.area.x1 = cellCoords.x;
+        this.area.y1 = cellCoords.y;
     }
 
     mousemove(x, y) {
         if (this.process) {
-            let width = Math.abs(this.coords.x - x);
-            let height = Math.abs(this.coords.y - y);
+            let width = Math.abs(this.coordsClick.x - x);
+            let height = Math.abs(this.coordsClick.y - y);
 
             if (width < 5 && height < 5) {
                 return;
@@ -53,14 +55,22 @@ export default class ActionsPickMode {
 
         let cellCoords = getCellCoords(x, y);
 
-        this.cellCoords.x2 = cellCoords.x;
-        this.cellCoords.y2 = cellCoords.y;
+        this.area.x2 = cellCoords.x;
+        this.area.y2 = cellCoords.y;
 
-        notebook.selectedArea = {
-            x1: this.cellCoords.x1,
-            y1: this.cellCoords.y1,
-            x2: this.cellCoords.x2,
-            y2: this.cellCoords.y2
-        }
+        let selectedArea = {
+            x1: this.area.x1 + 1,
+            y1: this.area.y1 + 1,
+            x2: this.area.x2 - 1,
+            y2: this.area.y2 - 1
+        };
+
+        pickAreaNode.style.left = selectedArea.x1 * CELL_SIZE + 'px';
+        pickAreaNode.style.top = selectedArea.y1 * CELL_SIZE + 'px';
+        pickAreaNode.style.width = (selectedArea.x2 - selectedArea.x1 + 1) * CELL_SIZE + 'px';
+        pickAreaNode.style.height = (selectedArea.y2 - selectedArea.y1 + 1) * CELL_SIZE + 'px';
+        // Возвращаем координаты выделенной области
+        console.log(selectedArea);
+        return selectedArea;
     }
 };

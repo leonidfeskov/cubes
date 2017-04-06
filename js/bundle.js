@@ -359,20 +359,23 @@ class ActionsDrawMode {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__consts__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_utils__ = __webpack_require__(1);
+
 
 
 let pickAreaNode = document.querySelector('.js-pick-area');
 
 class ActionsPickMode {
-    constructor(notebook) {
-        this.notebook = notebook;
+    constructor() {
         this.process = false;
-        this.coords = {};
-        this.cellCoords = {};
+        this.coordsClick = {};
+        this.area = {};
     }
 
-    mousedown(x, y) {
+    mousedown(x, y, event) {
+        event.preventDefault();
+
         this.process = true;
 
         pickAreaNode.style.display = 'none';
@@ -382,21 +385,21 @@ class ActionsPickMode {
         pickAreaNode.style.top = y + 'px';
 
         // запоминаем координаты, где произошло событие mousedown
-        this.coords = {
+        this.coordsClick = {
             x: x,
             y: y
         };
 
-        let cellCoords = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils_utils__["b" /* getCellCoords */])(x, y);
+        let cellCoords = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_utils__["b" /* getCellCoords */])(x, y);
 
-        this.cellCoords.x1 = cellCoords.x;
-        this.cellCoords.y1 = cellCoords.y;
+        this.area.x1 = cellCoords.x;
+        this.area.y1 = cellCoords.y;
     }
 
     mousemove(x, y) {
         if (this.process) {
-            let width = Math.abs(this.coords.x - x);
-            let height = Math.abs(this.coords.y - y);
+            let width = Math.abs(this.coordsClick.x - x);
+            let height = Math.abs(this.coordsClick.y - y);
 
             if (width < 5 && height < 5) {
                 return;
@@ -412,17 +415,25 @@ class ActionsPickMode {
     mouseup(x, y) {
         this.process = false;
 
-        let cellCoords = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils_utils__["b" /* getCellCoords */])(x, y);
+        let cellCoords = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_utils__["b" /* getCellCoords */])(x, y);
 
-        this.cellCoords.x2 = cellCoords.x;
-        this.cellCoords.y2 = cellCoords.y;
+        this.area.x2 = cellCoords.x;
+        this.area.y2 = cellCoords.y;
 
-        notebook.selectedArea = {
-            x1: this.cellCoords.x1,
-            y1: this.cellCoords.y1,
-            x2: this.cellCoords.x2,
-            y2: this.cellCoords.y2
+        let selectedArea = {
+            x1: this.area.x1 + 1,
+            y1: this.area.y1 + 1,
+            x2: this.area.x2 - 1,
+            y2: this.area.y2 - 1
         };
+
+        pickAreaNode.style.left = selectedArea.x1 * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
+        pickAreaNode.style.top = selectedArea.y1 * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
+        pickAreaNode.style.width = (selectedArea.x2 - selectedArea.x1 + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
+        pickAreaNode.style.height = (selectedArea.y2 - selectedArea.y1 + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
+        // Возвращаем координаты выделенной области
+        console.log(selectedArea);
+        return selectedArea;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = ActionsPickMode;
@@ -455,10 +466,10 @@ class Notebook {
         this.targetCell = { x: 0, y: 0 };
 
         this.selectedArea = {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0
+            x1: 0,
+            y1: 0,
+            x2: 0,
+            y2: 0
         };
 
         this.mode = __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* MODE_DRAW */];
@@ -508,13 +519,28 @@ class Notebook {
     }
 
     copy() {
-        let dx = Math.abs(this.selectedArea.x2 - this.selectedArea.x1);
-        let dy = Math.abs(this.selectedArea.y2 - this.selectedArea.y1);
+        let dx = Math.abs(this.selectedArea.x2 - this.selectedArea.x1 + 1);
+        let dy = Math.abs(this.selectedArea.y2 - this.selectedArea.y1 + 1);
 
         for (let i = 0; i <= dy; i++) {
             this.buffer[i] = [];
             for (let j = 0; j <= dx; j++) {
-                this.buffer[i][j] = this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j];
+                if (i < dy && j < dx) {
+                    this.buffer[i][j] = this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j];
+                    continue;
+                }
+
+                if (i === dy) {
+                    this.buffer[i][j] = {
+                        top: this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j].top
+                    };
+                }
+
+                if (j === dx) {
+                    this.buffer[i][j] = {
+                        left: this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j].left
+                    };
+                }
             }
         }
     }
@@ -526,11 +552,26 @@ class Notebook {
         for (let i = 0; i < height; i++) {
             for (let j = 0; j < width; j++) {
                 let cell = this.buffer[i][j];
-                this.data[this.targetCell.y + i][this.targetCell.x + j] = {
-                    top: cell.top,
-                    left: cell.left,
-                    diagonal: cell.diagonal
-                };
+
+                if (i < height - 1 && j < width - 1) {
+                    this.data[this.targetCell.y + i][this.targetCell.x + j] = {
+                        top: cell.top,
+                        left: cell.left,
+                        diagonal: cell.diagonal
+                    };
+                }
+
+                if (i === height - 1) {
+                    if (cell.top) {
+                        this.data[this.targetCell.y + i][this.targetCell.x + j].top = cell.top;
+                    }
+                }
+
+                if (j === width - 1) {
+                    if (cell.left) {
+                        this.data[this.targetCell.y + i][this.targetCell.x + j].left = cell.left;
+                    }
+                }
             }
         }
         this.syncWithStorage();
@@ -601,7 +642,7 @@ canvas.addEventListener('mousedown', function (event) {
             actionsDrawMode.mousedown(x, y, event.altKey);
             break;
         case __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]:
-            actionsPickMode.mousedown(x, y);
+            actionsPickMode.mousedown(x, y, event);
             break;
         default:
             break;
@@ -617,7 +658,7 @@ canvas.addEventListener('mousemove', function (event) {
             actionsDrawMode.mousemove(x, y, event.altKey);
             break;
         case __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]:
-            actionsPickMode.mousemove(x, y);
+            actionsPickMode.mousemove(x, y, event);
             break;
         default:
             break;
@@ -633,7 +674,7 @@ document.addEventListener('mouseup', function (event) {
             actionsDrawMode.mouseup();
             break;
         case __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]:
-            actionsPickMode.mouseup(x, y);
+            notebook.selectedArea = actionsPickMode.mouseup(x, y);
             break;
         default:
             break;

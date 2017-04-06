@@ -48,7 +48,7 @@ canvas.addEventListener('mousedown', function(event) {
             actionsDrawMode.mousedown(x, y, event.altKey);
             break;
         case MODE_PICK:
-            actionsPickMode.mousedown(x, y);
+            actionsPickMode.mousedown(x, y, event);
             break;
         default:
             break;
@@ -64,7 +64,7 @@ canvas.addEventListener('mousemove', function(event) {
             actionsDrawMode.mousemove(x, y, event.altKey);
             break;
         case MODE_PICK:
-            actionsPickMode.mousemove(x, y);
+            actionsPickMode.mousemove(x, y, event);
             break;
         default:
             break;
@@ -80,7 +80,7 @@ document.addEventListener('mouseup', function(event) {
             actionsDrawMode.mouseup();
             break;
         case MODE_PICK:
-            actionsPickMode.mouseup(x, y);
+            notebook.selectedArea = actionsPickMode.mouseup(x, y);
             break;
         default:
             break;
