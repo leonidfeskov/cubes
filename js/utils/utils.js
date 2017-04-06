@@ -15,3 +15,11 @@ export function getOffset(element) {
         left: box.left + pageXOffset
     };
 }
+
+export function mergeCells(cell1, cell2) {
+    return {
+        top: cell1.top || cell2.top,
+        left: cell1.left || cell2.left,
+        diagonal: cell1.diagonal || cell2.diagonal
+    }
+}

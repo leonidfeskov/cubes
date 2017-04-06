@@ -1,7 +1,7 @@
 import { MODE_DRAW, MODE_PICK, KEY_CODES } from './consts';
 import { getCellCoords, getOffset } from './utils/utils';
 import Notebook from './models/notebook';
-import { drawGrid, clearAll } from './draw';
+import { drawGrid, clearAll, selectCell } from './draw';
 import ActionsDrawMode from './actions/drawMode';
 import ActionsPickMode from './actions/pickMode';
 
@@ -33,6 +33,7 @@ canvas.addEventListener('click', function(event) {
                 x: cellCoords.x,
                 y: cellCoords.y
             };
+            //selectCell(cellCoords);
             break;
         default:
             break;
@@ -45,7 +46,7 @@ canvas.addEventListener('mousedown', function(event) {
 
     switch (notebook.mode) {
         case MODE_DRAW:
-            actionsDrawMode.mousedown(x, y, event.altKey);
+            actionsDrawMode.mousedown(x, y, event);
             break;
         case MODE_PICK:
             actionsPickMode.mousedown(x, y, event);
@@ -61,7 +62,7 @@ canvas.addEventListener('mousemove', function(event) {
 
     switch (notebook.mode) {
         case MODE_DRAW:
-            actionsDrawMode.mousemove(x, y, event.altKey);
+            actionsDrawMode.mousemove(x, y, event);
             break;
         case MODE_PICK:
             actionsPickMode.mousemove(x, y, event);
@@ -80,7 +81,7 @@ document.addEventListener('mouseup', function(event) {
             actionsDrawMode.mouseup();
             break;
         case MODE_PICK:
-            notebook.selectedArea = actionsPickMode.mouseup(x, y);
+            notebook.selectedArea = actionsPickMode.mouseup(x, y, event);
             break;
         default:
             break;

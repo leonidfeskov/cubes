@@ -9,7 +9,8 @@ export default class ActionsDrawMode {
         this.currentCell = {};
     }
 
-    mousedown(x, y, altKey) {
+    mousedown(x, y, event) {
+        event.preventDefault();
         this.process = true;
 
         let cellCoords = getCellCoords(x, y);
@@ -22,7 +23,7 @@ export default class ActionsDrawMode {
         let distanceToRight = ((cellCoords.x + 1) * CELL_SIZE) - x;
 
         // стираем всю клетку
-        if (altKey) {
+        if (event.altKey) {
             this.notebook.removeCell(cellCoords);
             return;
         }
@@ -59,14 +60,14 @@ export default class ActionsDrawMode {
         }
     }
 
-    mousemove(x, y, altKey) {
+    mousemove(x, y, event) {
         if (this.process) {
 
             let cellCoords = getCellCoords(x, y);
             let cell = this.notebook.data[cellCoords.y][cellCoords.x];
 
             // стираем всю клетку
-            if (altKey) {
+            if (event.altKey) {
                 this.notebook.removeCell(cellCoords);
                 return;
             }

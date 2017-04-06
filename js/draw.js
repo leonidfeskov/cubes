@@ -1,6 +1,8 @@
 import { CELL_SIZE, WIDTH, HEIGHT, COLOR_GRID, COLOR_STROKE, CELLS_COUNT_BY_X, CELLS_COUNT_BY_Y } from './consts';
 
 
+let pickAreaNode = document.querySelector('.js-pick-area');
+
 let canvasGrid = document.getElementById('cubes-grid');
 let canvas = document.getElementById('cubes-canvas');
 
@@ -83,4 +85,13 @@ export function redrawAll(data) {
             }
         }
     }
+}
+
+export function selectCell(cellCoords) {
+    pickAreaNode.style.display = 'none';
+    pickAreaNode.style.left = cellCoords.x * CELL_SIZE + 'px';
+    pickAreaNode.style.top = cellCoords.y * CELL_SIZE + 'px';
+    pickAreaNode.style.width = CELL_SIZE + 'px';
+    pickAreaNode.style.height = CELL_SIZE + 'px';
+    pickAreaNode.style.display = 'block';
 }

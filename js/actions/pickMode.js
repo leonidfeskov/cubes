@@ -70,7 +70,6 @@ export default class ActionsPickMode {
         pickAreaNode.style.width = (selectedArea.x2 - selectedArea.x1 + 1) * CELL_SIZE + 'px';
         pickAreaNode.style.height = (selectedArea.y2 - selectedArea.y1 + 1) * CELL_SIZE + 'px';
         // Возвращаем координаты выделенной области
-        console.log(selectedArea);
         return selectedArea;
     }
 };

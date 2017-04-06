@@ -1,5 +1,6 @@
 import { CELLS_COUNT_BY_X, CELLS_COUNT_BY_Y, MODE_DRAW } from '../consts';
 import { drawStroke, redrawAll } from '../draw';
+import { mergeCells } from '../utils/utils';
 
 
 let Cell = function() {
@@ -76,22 +77,24 @@ export default class Notebook {
 
         for (let i = y1; i <= y2 + 1; i++) {
             for (let j = x1; j <= x2 + 1; j++) {
-                if (i < y2 + 1 && j < x2 + 1) {
-                    this.data[i][j] = new Cell();
+                // так как каждая ячейка хранит только верхнюю и левую стороны,
+                // то стираем еще и левые границы в столбце правее выделенной области
+                // и верхние границы в строке ниже выделенной области
+                if (j === x2 + 1 && i === y2 + 1) {
                     continue;
                 }
 
-                if (i === y2 + 1 && j === x2 + 1) {
+                if (j === x2 + 1) {
+                    this.data[i][j].left = null;
                     continue;
                 }
 
                 if (i === y2 + 1) {
                     this.data[i][j].top = null;
+                    continue;
                 }
 
-                if (j === x2 + 1) {
-                    this.data[i][j].left = null;
-                }
+                this.data[i][j] = new Cell();
             }
         }
 
@@ -100,32 +103,38 @@ export default class Notebook {
     }
 
     copy() {
-        let dx = Math.abs(this.selectedArea.x2 - this.selectedArea.x1 + 1);
-        let dy = Math.abs(this.selectedArea.y2 - this.selectedArea.y1 + 1);
+        let {x1, y1, x2, y2} = this.selectedArea;
+        let dx = Math.abs(x2 - x1 + 1);
+        let dy = Math.abs(y2 - y1 + 1);
+
+        this.buffer = [];
 
         for (let i = 0; i <= dy; i++) {
             this.buffer[i] = [];
             for (let j = 0; j <= dx; j++) {
-                if (i < dy && j < dx) {
-                    this.buffer[i][j] = this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j];
+
+                // так как каждая ячейка хранит только верхнюю и левую стороны,
+                // то копируем в буфер еще информацию об одном столбце правее и одной строке ниже выделенной областе
+                if (j === dx && i === dy) {
+                    this.buffer[i][j] = new Cell();
                     continue;
                 }
 
-                if (i === dy && j === dx) {
+                if (j === dx) {
+                    this.buffer[i][j] = {
+                        left: this.data[y1 + i][x1 + j].left
+                    };
                     continue;
                 }
 
                 if (i === dy) {
                     this.buffer[i][j] = {
-                        top: this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j].top
+                        top: this.data[y1 + i][x1 + j].top
                     };
+                    continue;
                 }
 
-                if (j === dx) {
-                    this.buffer[i][j] = {
-                        left: this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j].left
-                    };
-                }
+                this.buffer[i][j] = this.data[y1 + i][x1 + j];
             }
         }
     }
@@ -141,32 +150,12 @@ export default class Notebook {
 
         for (let i = 0; i < height; i++) {
             for (let j = 0; j < width; j++) {
-                let cell = this.buffer[i][j];
+                let cell = this.data[this.targetCell.y + i][this.targetCell.x + j];
+                let bufferCell = this.buffer[i][j];
 
-                if (i < height - 1 && j < width - 1) {
-                    this.data[this.targetCell.y + i][this.targetCell.x + j] = {
-                        top: cell.top,
-                        left: cell.left,
-                        diagonal: cell.diagonal
-                    };
-                    continue;
-                }
+                let newCell = mergeCells(cell, bufferCell);
 
-                if (i === height - 1 && j === width - 1) {
-                    continue;
-                }
-
-                if (i === height - 1) {
-                    if (cell.top) {
-                        this.data[this.targetCell.y + i][this.targetCell.x + j].top = cell.top;
-                    }
-                }
-
-                if (j === width - 1) {
-                    if (cell.left) {
-                        this.data[this.targetCell.y + i][this.targetCell.x + j].left = cell.left;
-                    }
-                }
+                this.data[this.targetCell.y + i][this.targetCell.x + j] = newCell;
             }
         }
         this.syncWithStorage();

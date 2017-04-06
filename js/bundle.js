@@ -123,6 +123,7 @@ const KEY_CODES = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__consts__ = __webpack_require__(0);
 /* harmony export (immutable) */ __webpack_exports__["b"] = getCellCoords;
 /* harmony export (immutable) */ __webpack_exports__["a"] = getOffset;
+/* harmony export (immutable) */ __webpack_exports__["c"] = mergeCells;
 
 
 function getCellCoords(x, y) {
@@ -140,6 +141,14 @@ function getOffset(element) {
     };
 }
 
+function mergeCells(cell1, cell2) {
+    return {
+        top: cell1.top || cell2.top,
+        left: cell1.left || cell2.left,
+        diagonal: cell1.diagonal || cell2.diagonal
+    };
+}
+
 /***/ }),
 /* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -150,7 +159,10 @@ function getOffset(element) {
 /* harmony export (immutable) */ __webpack_exports__["d"] = drawStroke;
 /* harmony export (immutable) */ __webpack_exports__["b"] = clearAll;
 /* harmony export (immutable) */ __webpack_exports__["c"] = redrawAll;
+/* unused harmony export selectCell */
 
+
+let pickAreaNode = document.querySelector('.js-pick-area');
 
 let canvasGrid = document.getElementById('cubes-grid');
 let canvas = document.getElementById('cubes-canvas');
@@ -236,6 +248,15 @@ function redrawAll(data) {
     }
 }
 
+function selectCell(cellCoords) {
+    pickAreaNode.style.display = 'none';
+    pickAreaNode.style.left = cellCoords.x * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
+    pickAreaNode.style.top = cellCoords.y * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
+    pickAreaNode.style.width = __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
+    pickAreaNode.style.height = __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
+    pickAreaNode.style.display = 'block';
+}
+
 /***/ }),
 /* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -253,7 +274,8 @@ class ActionsDrawMode {
         this.currentCell = {};
     }
 
-    mousedown(x, y, altKey) {
+    mousedown(x, y, event) {
+        event.preventDefault();
         this.process = true;
 
         let cellCoords = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_utils__["b" /* getCellCoords */])(x, y);
@@ -266,7 +288,7 @@ class ActionsDrawMode {
         let distanceToRight = (cellCoords.x + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] - x;
 
         // стираем всю клетку
-        if (altKey) {
+        if (event.altKey) {
             this.notebook.removeCell(cellCoords);
             return;
         }
@@ -299,14 +321,14 @@ class ActionsDrawMode {
         };
     }
 
-    mousemove(x, y, altKey) {
+    mousemove(x, y, event) {
         if (this.process) {
 
             let cellCoords = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_utils__["b" /* getCellCoords */])(x, y);
             let cell = this.notebook.data[cellCoords.y][cellCoords.x];
 
             // стираем всю клетку
-            if (altKey) {
+            if (event.altKey) {
                 this.notebook.removeCell(cellCoords);
                 return;
             }
@@ -433,7 +455,6 @@ class ActionsPickMode {
         pickAreaNode.style.width = (selectedArea.x2 - selectedArea.x1 + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
         pickAreaNode.style.height = (selectedArea.y2 - selectedArea.y1 + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
         // Возвращаем координаты выделенной области
-        console.log(selectedArea);
         return selectedArea;
     }
 }
@@ -447,6 +468,8 @@ class ActionsPickMode {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__consts__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__draw__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_utils__ = __webpack_require__(1);
+
 
 
 
@@ -524,22 +547,24 @@ class Notebook {
 
         for (let i = y1; i <= y2 + 1; i++) {
             for (let j = x1; j <= x2 + 1; j++) {
-                if (i < y2 + 1 && j < x2 + 1) {
-                    this.data[i][j] = new Cell();
+                // так как каждая ячейка хранит только верхнюю и левую стороны,
+                // то стираем еще и левые границы в столбце правее выделенной области
+                // и верхние границы в строке ниже выделенной области
+                if (j === x2 + 1 && i === y2 + 1) {
                     continue;
                 }
 
-                if (i === y2 + 1 && j === x2 + 1) {
+                if (j === x2 + 1) {
+                    this.data[i][j].left = null;
                     continue;
                 }
 
                 if (i === y2 + 1) {
                     this.data[i][j].top = null;
+                    continue;
                 }
 
-                if (j === x2 + 1) {
-                    this.data[i][j].left = null;
-                }
+                this.data[i][j] = new Cell();
             }
         }
 
@@ -548,32 +573,38 @@ class Notebook {
     }
 
     copy() {
-        let dx = Math.abs(this.selectedArea.x2 - this.selectedArea.x1 + 1);
-        let dy = Math.abs(this.selectedArea.y2 - this.selectedArea.y1 + 1);
+        let { x1, y1, x2, y2 } = this.selectedArea;
+        let dx = Math.abs(x2 - x1 + 1);
+        let dy = Math.abs(y2 - y1 + 1);
+
+        this.buffer = [];
 
         for (let i = 0; i <= dy; i++) {
             this.buffer[i] = [];
             for (let j = 0; j <= dx; j++) {
-                if (i < dy && j < dx) {
-                    this.buffer[i][j] = this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j];
+
+                // так как каждая ячейка хранит только верхнюю и левую стороны,
+                // то копируем в буфер еще информацию об одном столбце правее и одной строке ниже выделенной областе
+                if (j === dx && i === dy) {
+                    this.buffer[i][j] = new Cell();
                     continue;
                 }
 
-                if (i === dy && j === dx) {
+                if (j === dx) {
+                    this.buffer[i][j] = {
+                        left: this.data[y1 + i][x1 + j].left
+                    };
                     continue;
                 }
 
                 if (i === dy) {
                     this.buffer[i][j] = {
-                        top: this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j].top
+                        top: this.data[y1 + i][x1 + j].top
                     };
+                    continue;
                 }
 
-                if (j === dx) {
-                    this.buffer[i][j] = {
-                        left: this.data[this.selectedArea.y1 + i][this.selectedArea.x1 + j].left
-                    };
-                }
+                this.buffer[i][j] = this.data[y1 + i][x1 + j];
             }
         }
     }
@@ -589,32 +620,12 @@ class Notebook {
 
         for (let i = 0; i < height; i++) {
             for (let j = 0; j < width; j++) {
-                let cell = this.buffer[i][j];
+                let cell = this.data[this.targetCell.y + i][this.targetCell.x + j];
+                let bufferCell = this.buffer[i][j];
 
-                if (i < height - 1 && j < width - 1) {
-                    this.data[this.targetCell.y + i][this.targetCell.x + j] = {
-                        top: cell.top,
-                        left: cell.left,
-                        diagonal: cell.diagonal
-                    };
-                    continue;
-                }
+                let newCell = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__utils_utils__["c" /* mergeCells */])(cell, bufferCell);
 
-                if (i === height - 1 && j === width - 1) {
-                    continue;
-                }
-
-                if (i === height - 1) {
-                    if (cell.top) {
-                        this.data[this.targetCell.y + i][this.targetCell.x + j].top = cell.top;
-                    }
-                }
-
-                if (j === width - 1) {
-                    if (cell.left) {
-                        this.data[this.targetCell.y + i][this.targetCell.x + j].left = cell.left;
-                    }
-                }
+                this.data[this.targetCell.y + i][this.targetCell.x + j] = newCell;
             }
         }
         this.syncWithStorage();
@@ -670,6 +681,7 @@ canvas.addEventListener('click', function (event) {
                 x: cellCoords.x,
                 y: cellCoords.y
             };
+            //selectCell(cellCoords);
             break;
         default:
             break;
@@ -682,7 +694,7 @@ canvas.addEventListener('mousedown', function (event) {
 
     switch (notebook.mode) {
         case __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* MODE_DRAW */]:
-            actionsDrawMode.mousedown(x, y, event.altKey);
+            actionsDrawMode.mousedown(x, y, event);
             break;
         case __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]:
             actionsPickMode.mousedown(x, y, event);
@@ -698,7 +710,7 @@ canvas.addEventListener('mousemove', function (event) {
 
     switch (notebook.mode) {
         case __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* MODE_DRAW */]:
-            actionsDrawMode.mousemove(x, y, event.altKey);
+            actionsDrawMode.mousemove(x, y, event);
             break;
         case __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]:
             actionsPickMode.mousemove(x, y, event);
@@ -717,7 +729,7 @@ document.addEventListener('mouseup', function (event) {
             actionsDrawMode.mouseup();
             break;
         case __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]:
-            notebook.selectedArea = actionsPickMode.mouseup(x, y);
+            notebook.selectedArea = actionsPickMode.mouseup(x, y, event);
             break;
         default:
             break;
