@@ -7,7 +7,11 @@ import ActionsPickMode from './actions/pickMode';
 
 
 let canvas = document.getElementById('cubes-canvas');
+let ctx = canvas.getContext('2d');
+
 let controlsNode = document.querySelector('.js-controls');
+let controlColor = document.querySelector('.js-control-color');
+
 let buttonClearAll = document.querySelector('.js-clear-all');
 let buttonSaveImage = document.querySelector('.js-save-image');
 
@@ -94,15 +98,30 @@ controlsNode.addEventListener('click', function(event) {
     if (elementClasses.contains('js-mode')) {
         let button = event.target;
         let mode = button.getAttribute('data-mode');
-        let classPressed = 'button_pressed';
+        let classPressed = 'button-control_pressed';
 
         if (elementClasses.contains(classPressed)) {
-            elementClasses.remove('button_pressed');
+            elementClasses.remove(classPressed);
             notebook.mode = MODE_DRAW;
         } else {
-            elementClasses.add('button_pressed');
+            elementClasses.add(classPressed);
             notebook.mode = mode;
         }
+    }
+});
+
+controlColor.addEventListener('click', function(event) {
+    let elementClasses = event.target.classList;
+
+    if (elementClasses.contains('control-color')) {
+        let prevActiveButton = controlColor.querySelector('.current');
+        prevActiveButton.classList.remove('current');
+
+        let button = event.target;
+        let color = button.style.backgroundColor;
+
+        elementClasses.add('current');
+        ctx.strokeStyle = color;
     }
 });
 

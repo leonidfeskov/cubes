@@ -6,15 +6,61 @@
         <link rel="stylesheet" href="css/main.css">
     </head>
     <body>
-        <div class="controls js-controls">
-            <button class="button js-mode" data-mode="PICK">Pick mode</button>
-            <button class="button js-clear-all">Clear all</button>
-            <button class="button js-save-image">Save image</button>
-        </div>
-        <div class="canvas-wrapper">
-            <canvas id="cubes-grid" class="canvas-grid"></canvas>
-            <canvas id="cubes-canvas" class="canvas-draw"></canvas>
-            <div class="canvas-pick-area js-pick-area"></div>
+        <div class="container">
+            <div class="panel">
+                <div class="controls js-controls">
+                    <div class="controls-group">
+                        <button class="button-control button-control_pressed js-mode" data-mode="DRAW">
+                            <img class="button-control__icon" src="i/pencil.svg">
+                        </button>
+                        <button class="button-control js-mode" data-mode="PICK">
+                            <img class="button-control__icon" src="i/cursor.svg">
+                        </button>
+                        <button class="button-control js-mode" data-mode="CLEAR">
+                            <img class="button-control__icon" src="i/rubber.svg">
+                        </button>
+                    </div>
+
+                    <div class="controls-group">
+                        <button class="button-control js-clear-all">
+                            <img class="button-control__icon" src="i/rubber.svg">
+                        </button>
+                        <button class="button-control js-save-image">
+                            <img class="button-control__icon" src="i/save.svg">
+                        </button>
+                    </div>
+
+                    <div class="controls-group js-control-color">
+                        <div class="control-color current" style="background-color: #000000;"></div>
+                        <div class="control-color" style="background-color: #ffffff;"></div>
+                        <div class="control-color" style="background-color: #F44336;"></div>
+                        <div class="control-color" style="background-color: #E91E63;"></div>
+                        <div class="control-color" style="background-color: #9C27B0;"></div>
+                        <div class="control-color" style="background-color: #673AB7;"></div>
+                        <div class="control-color" style="background-color: #3F51B5;"></div>
+                        <div class="control-color" style="background-color: #2196F3;"></div>
+                        <div class="control-color" style="background-color: #03A9F4;"></div>
+                        <div class="control-color" style="background-color: #00BCD4;"></div>
+                        <div class="control-color" style="background-color: #009688;"></div>
+                        <div class="control-color" style="background-color: #4CAF50;"></div>
+                        <div class="control-color" style="background-color: #8BC34A;"></div>
+                        <div class="control-color" style="background-color: #CDDC39;"></div>
+                        <div class="control-color" style="background-color: #FFEB3B;"></div>
+                        <div class="control-color" style="background-color: #FFC107;"></div>
+                        <div class="control-color" style="background-color: #FF9800;"></div>
+                        <div class="control-color" style="background-color: #FF5722;"></div>
+                        <div class="control-color" style="background-color: #795548;"></div>
+                        <!--div class="control-color" style="background-color: #9E9E9E;"></div-->
+                        <div class="control-color" style="background-color: #607D8B;"></div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="cubes-grid" class="canvas-grid"></canvas>
+                <canvas id="cubes-canvas" class="canvas-draw"></canvas>
+                <div class="canvas-pick-area js-pick-area"></div>
+            </div>
         </div>
         
         <script src="js/bundle.js"></script>
