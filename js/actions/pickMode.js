@@ -6,6 +6,7 @@ let pickAreaNode = document.querySelector('.js-pick-area');
 
 export default class ActionsPickMode {
     constructor() {
+        this.click = true;
         this.process = false;
         this.coordsClick = {};
         this.area = {};
@@ -14,6 +15,7 @@ export default class ActionsPickMode {
     mousedown(x, y, event) {
         event.preventDefault();
 
+        this.click = true;
         this.process = true;
 
         pickAreaNode.style.display = 'none';
@@ -34,7 +36,7 @@ export default class ActionsPickMode {
         this.area.y1 = cellCoords.y;
     }
 
-    mousemove(x, y) {
+    mousemove(x, y, event) {
         if (this.process) {
             let width = Math.abs(this.coordsClick.x - x);
             let height = Math.abs(this.coordsClick.y - y);
@@ -42,9 +44,9 @@ export default class ActionsPickMode {
             if (width < 5 && height < 5) {
                 return;
             }
+            this.click = false;
 
             pickAreaNode.style.display = 'block';
-
             pickAreaNode.style.width = width + 'px';
             pickAreaNode.style.height = height + 'px';
         }

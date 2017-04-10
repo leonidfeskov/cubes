@@ -10,9 +10,11 @@ export const COLOR_GRID = '#EEEEEE';
 export const COLOR_STROKE = '#212121';
 
 export const MODE_DRAW = 'DRAW';
+export const MODE_CLEAR = 'CLEAR';
 export const MODE_PICK = 'PICK';
 
 export const KEY_CODES = {
+    alt: 18,
     ctrl: 17,
     cmd: 91,
     c: 67,

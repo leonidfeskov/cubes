@@ -95,3 +95,7 @@ export function selectCell(cellCoords) {
     pickAreaNode.style.height = CELL_SIZE + 'px';
     pickAreaNode.style.display = 'block';
 }
+
+export function hideSelectedCells() {
+    pickAreaNode.style.display = 'none';
+}

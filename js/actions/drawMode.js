@@ -22,12 +22,6 @@ export default class ActionsDrawMode {
         let distanceToLeft = x - (cellCoords.x * CELL_SIZE);
         let distanceToRight = ((cellCoords.x + 1) * CELL_SIZE) - x;
 
-        // стираем всю клетку
-        if (event.altKey) {
-            this.notebook.removeCell(cellCoords);
-            return;
-        }
-
         // рисуем необходимую линиию в зависимости от того к какой стороне ячейки кликнули ближе
         if (distanceToTop <= DIVIATION && distanceToTop <= distanceToLeft && distanceToTop < distanceToRight) {
             this.notebook.addStroke(cellCoords, 'top');
@@ -65,12 +59,6 @@ export default class ActionsDrawMode {
 
             let cellCoords = getCellCoords(x, y);
             let cell = this.notebook.data[cellCoords.y][cellCoords.x];
-
-            // стираем всю клетку
-            if (event.altKey) {
-                this.notebook.removeCell(cellCoords);
-                return;
-            }
 
             switch (this.currentCell.strokeType) {
                 case 'top':

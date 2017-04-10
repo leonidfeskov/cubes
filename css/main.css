@@ -30,7 +30,8 @@ body {
 }
 
 .button-control {
-    background: #ECEFF1;
+    background: #ECEFF1 no-repeat 50% 50%;
+    background-size: 70%;
     border: 1px solid #90A4AE;
     border-radius: 2px;
     box-sizing: border-box;
@@ -55,6 +56,11 @@ body {
 .button-control_pressed {
     background-color: #90CAF9;
 }
+
+.button-control_draw {background-image: url("../i/pencil.svg");}
+.button-control_pick {background-image: url("../i/cursor.svg");}
+.button-control_rubber {background-image: url("../i/rubber.svg");}
+.button-control_save {background-image: url("../i/save.svg");}
 
 .control-color {
     box-sizing: border-box;
@@ -92,16 +98,4 @@ body {
     top: 0;
     display: none;
     z-index: -1;
-}
-
-.console {
-    background: #fff;
-    font-size: 12px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    box-sizing: border-box;
-    padding: 10px;
-    border-top: 1px solid;
 }

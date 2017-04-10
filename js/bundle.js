@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -72,47 +72,51 @@
 
 "use strict";
 const CELL_SIZE = 30;
-/* harmony export (immutable) */ __webpack_exports__["h"] = CELL_SIZE;
+/* harmony export (immutable) */ __webpack_exports__["i"] = CELL_SIZE;
 
 const CELLS_COUNT_BY_X = 50;
-/* harmony export (immutable) */ __webpack_exports__["j"] = CELLS_COUNT_BY_X;
+/* harmony export (immutable) */ __webpack_exports__["k"] = CELLS_COUNT_BY_X;
 
 const CELLS_COUNT_BY_Y = 40;
-/* harmony export (immutable) */ __webpack_exports__["i"] = CELLS_COUNT_BY_Y;
+/* harmony export (immutable) */ __webpack_exports__["j"] = CELLS_COUNT_BY_Y;
 
 const DIVIATION = Math.round(CELL_SIZE / 5);
-/* harmony export (immutable) */ __webpack_exports__["k"] = DIVIATION;
+/* harmony export (immutable) */ __webpack_exports__["l"] = DIVIATION;
 
 
 const WIDTH = CELL_SIZE * CELLS_COUNT_BY_X;
-/* harmony export (immutable) */ __webpack_exports__["d"] = WIDTH;
+/* harmony export (immutable) */ __webpack_exports__["e"] = WIDTH;
 
 const HEIGHT = CELL_SIZE * CELLS_COUNT_BY_Y;
-/* harmony export (immutable) */ __webpack_exports__["e"] = HEIGHT;
+/* harmony export (immutable) */ __webpack_exports__["f"] = HEIGHT;
 
 
 const COLOR_GRID = '#EEEEEE';
-/* harmony export (immutable) */ __webpack_exports__["f"] = COLOR_GRID;
+/* harmony export (immutable) */ __webpack_exports__["g"] = COLOR_GRID;
 
 const COLOR_STROKE = '#212121';
-/* harmony export (immutable) */ __webpack_exports__["g"] = COLOR_STROKE;
+/* harmony export (immutable) */ __webpack_exports__["h"] = COLOR_STROKE;
 
 
 const MODE_DRAW = 'DRAW';
-/* harmony export (immutable) */ __webpack_exports__["b"] = MODE_DRAW;
+/* harmony export (immutable) */ __webpack_exports__["d"] = MODE_DRAW;
+
+const MODE_CLEAR = 'CLEAR';
+/* harmony export (immutable) */ __webpack_exports__["c"] = MODE_CLEAR;
 
 const MODE_PICK = 'PICK';
 /* harmony export (immutable) */ __webpack_exports__["a"] = MODE_PICK;
 
 
 const KEY_CODES = {
+    alt: 18,
     ctrl: 17,
     cmd: 91,
     c: 67,
     v: 86,
     x: 88
 };
-/* harmony export (immutable) */ __webpack_exports__["c"] = KEY_CODES;
+/* harmony export (immutable) */ __webpack_exports__["b"] = KEY_CODES;
 
 
 /***/ }),
@@ -128,8 +132,8 @@ const KEY_CODES = {
 
 function getCellCoords(x, y) {
     return {
-        x: Math.floor(x / __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */]),
-        y: Math.floor(y / __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */])
+        x: Math.floor(x / __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */]),
+        y: Math.floor(y / __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */])
     };
 }
 
@@ -156,10 +160,11 @@ function mergeCells(cell1, cell2) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__consts__ = __webpack_require__(0);
 /* harmony export (immutable) */ __webpack_exports__["a"] = drawGrid;
-/* harmony export (immutable) */ __webpack_exports__["d"] = drawStroke;
-/* harmony export (immutable) */ __webpack_exports__["b"] = clearAll;
-/* harmony export (immutable) */ __webpack_exports__["c"] = redrawAll;
-/* unused harmony export selectCell */
+/* harmony export (immutable) */ __webpack_exports__["f"] = drawStroke;
+/* harmony export (immutable) */ __webpack_exports__["c"] = clearAll;
+/* harmony export (immutable) */ __webpack_exports__["e"] = redrawAll;
+/* harmony export (immutable) */ __webpack_exports__["d"] = selectCell;
+/* harmony export (immutable) */ __webpack_exports__["b"] = hideSelectedCells;
 
 
 let pickAreaNode = document.querySelector('.js-pick-area');
@@ -170,27 +175,27 @@ let canvas = document.getElementById('cubes-canvas');
 let ctxGrid = canvasGrid.getContext('2d');
 let ctx = canvas.getContext('2d');
 
-canvas.width = canvasGrid.width = __WEBPACK_IMPORTED_MODULE_0__consts__["d" /* WIDTH */];
-canvas.height = canvasGrid.height = __WEBPACK_IMPORTED_MODULE_0__consts__["e" /* HEIGHT */];
+canvas.width = canvasGrid.width = __WEBPACK_IMPORTED_MODULE_0__consts__["e" /* WIDTH */];
+canvas.height = canvasGrid.height = __WEBPACK_IMPORTED_MODULE_0__consts__["f" /* HEIGHT */];
 
-ctxGrid.strokeStyle = __WEBPACK_IMPORTED_MODULE_0__consts__["f" /* COLOR_GRID */];
-ctx.strokeStyle = __WEBPACK_IMPORTED_MODULE_0__consts__["g" /* COLOR_STROKE */];
+ctxGrid.strokeStyle = __WEBPACK_IMPORTED_MODULE_0__consts__["g" /* COLOR_GRID */];
+ctx.strokeStyle = __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* COLOR_STROKE */];
 
 function drawGrid() {
     // горизонтальные линии
     ctxGrid.beginPath();
     let i = 0;
-    while (__WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * i <= __WEBPACK_IMPORTED_MODULE_0__consts__["e" /* HEIGHT */]) {
-        ctxGrid.moveTo(0, __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * i);
-        ctxGrid.lineTo(__WEBPACK_IMPORTED_MODULE_0__consts__["d" /* WIDTH */], __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * i);
+    while (__WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * i <= __WEBPACK_IMPORTED_MODULE_0__consts__["f" /* HEIGHT */]) {
+        ctxGrid.moveTo(0, __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * i);
+        ctxGrid.lineTo(__WEBPACK_IMPORTED_MODULE_0__consts__["e" /* WIDTH */], __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * i);
         i++;
     }
 
     // вертикальные линии
     let j = 0;
-    while (__WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * j <= __WEBPACK_IMPORTED_MODULE_0__consts__["d" /* WIDTH */]) {
-        ctxGrid.moveTo(__WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * j, 0);
-        ctxGrid.lineTo(__WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * j, __WEBPACK_IMPORTED_MODULE_0__consts__["e" /* HEIGHT */]);
+    while (__WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * j <= __WEBPACK_IMPORTED_MODULE_0__consts__["e" /* WIDTH */]) {
+        ctxGrid.moveTo(__WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * j, 0);
+        ctxGrid.lineTo(__WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * j, __WEBPACK_IMPORTED_MODULE_0__consts__["f" /* HEIGHT */]);
         j++;
     }
     ctxGrid.closePath();
@@ -202,16 +207,16 @@ function drawStroke(cellCoords, strokeType) {
 
     switch (strokeType) {
         case 'top':
-            ctx.moveTo(__WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * cellCoords.x, __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * cellCoords.y);
-            ctx.lineTo(__WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * (cellCoords.x + 1), __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * cellCoords.y);
+            ctx.moveTo(__WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * cellCoords.x, __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * cellCoords.y);
+            ctx.lineTo(__WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * (cellCoords.x + 1), __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * cellCoords.y);
             break;
         case 'left':
-            ctx.moveTo(__WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * cellCoords.x, __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * cellCoords.y);
-            ctx.lineTo(__WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * cellCoords.x, __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * (cellCoords.y + 1));
+            ctx.moveTo(__WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * cellCoords.x, __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * cellCoords.y);
+            ctx.lineTo(__WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * cellCoords.x, __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * (cellCoords.y + 1));
             break;
         case 'diagonal':
-            ctx.moveTo(__WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * cellCoords.x, __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * (cellCoords.y + 1));
-            ctx.lineTo(__WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * (cellCoords.x + 1), __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] * cellCoords.y);
+            ctx.moveTo(__WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * cellCoords.x, __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * (cellCoords.y + 1));
+            ctx.lineTo(__WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * (cellCoords.x + 1), __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] * cellCoords.y);
             break;
         default:
             break;
@@ -222,14 +227,14 @@ function drawStroke(cellCoords, strokeType) {
 }
 
 function clearAll() {
-    ctx.clearRect(0, 0, __WEBPACK_IMPORTED_MODULE_0__consts__["d" /* WIDTH */], __WEBPACK_IMPORTED_MODULE_0__consts__["e" /* HEIGHT */]);
+    ctx.clearRect(0, 0, __WEBPACK_IMPORTED_MODULE_0__consts__["e" /* WIDTH */], __WEBPACK_IMPORTED_MODULE_0__consts__["f" /* HEIGHT */]);
 }
 
 function redrawAll(data) {
     clearAll();
 
-    for (let i = 0; i < __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELLS_COUNT_BY_Y */]; i++) {
-        for (let j = 0; j < __WEBPACK_IMPORTED_MODULE_0__consts__["j" /* CELLS_COUNT_BY_X */]; j++) {
+    for (let i = 0; i < __WEBPACK_IMPORTED_MODULE_0__consts__["j" /* CELLS_COUNT_BY_Y */]; i++) {
+        for (let j = 0; j < __WEBPACK_IMPORTED_MODULE_0__consts__["k" /* CELLS_COUNT_BY_X */]; j++) {
             let cell = data[i][j];
             let cellCoords = {
                 x: j,
@@ -250,15 +255,59 @@ function redrawAll(data) {
 
 function selectCell(cellCoords) {
     pickAreaNode.style.display = 'none';
-    pickAreaNode.style.left = cellCoords.x * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
-    pickAreaNode.style.top = cellCoords.y * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
-    pickAreaNode.style.width = __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
-    pickAreaNode.style.height = __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
+    pickAreaNode.style.left = cellCoords.x * __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] + 'px';
+    pickAreaNode.style.top = cellCoords.y * __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] + 'px';
+    pickAreaNode.style.width = __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] + 'px';
+    pickAreaNode.style.height = __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] + 'px';
     pickAreaNode.style.display = 'block';
+}
+
+function hideSelectedCells() {
+    pickAreaNode.style.display = 'none';
 }
 
 /***/ }),
 /* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_utils__ = __webpack_require__(1);
+
+
+class ActionsClearMode {
+    constructor(notebook) {
+        this.notebook = notebook;
+        this.process = false;
+        this.currentCell = {};
+    }
+
+    clearCell(x, y) {
+        let cellCoords = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils_utils__["b" /* getCellCoords */])(x, y);
+        this.notebook.removeCell(cellCoords);
+    }
+
+    mousedown(x, y, event) {
+        event.preventDefault();
+        this.process = true;
+
+        this.clearCell(x, y);
+    }
+
+    mousemove(x, y) {
+        if (this.process) {
+            this.clearCell(x, y);
+        }
+    }
+
+    mouseup() {
+        this.process = false;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = ActionsClearMode;
+;
+
+/***/ }),
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -282,30 +331,24 @@ class ActionsDrawMode {
 
         // координаты клика относительно текущей ячейки
         // по ним определяем какую именно сторону ячейки пользователь хочет нарисовать
-        let distanceToTop = y - cellCoords.y * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */];
-        let distanceToBottom = (cellCoords.y + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] - y;
-        let distanceToLeft = x - cellCoords.x * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */];
-        let distanceToRight = (cellCoords.x + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] - x;
-
-        // стираем всю клетку
-        if (event.altKey) {
-            this.notebook.removeCell(cellCoords);
-            return;
-        }
+        let distanceToTop = y - cellCoords.y * __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */];
+        let distanceToBottom = (cellCoords.y + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] - y;
+        let distanceToLeft = x - cellCoords.x * __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */];
+        let distanceToRight = (cellCoords.x + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] - x;
 
         // рисуем необходимую линиию в зависимости от того к какой стороне ячейки кликнули ближе
-        if (distanceToTop <= __WEBPACK_IMPORTED_MODULE_0__consts__["k" /* DIVIATION */] && distanceToTop <= distanceToLeft && distanceToTop < distanceToRight) {
+        if (distanceToTop <= __WEBPACK_IMPORTED_MODULE_0__consts__["l" /* DIVIATION */] && distanceToTop <= distanceToLeft && distanceToTop < distanceToRight) {
             this.notebook.addStroke(cellCoords, 'top');
             this.currentCell.strokeType = 'top';
-        } else if (distanceToRight <= __WEBPACK_IMPORTED_MODULE_0__consts__["k" /* DIVIATION */] && distanceToRight <= distanceToTop && distanceToRight < distanceToBottom) {
+        } else if (distanceToRight <= __WEBPACK_IMPORTED_MODULE_0__consts__["l" /* DIVIATION */] && distanceToRight <= distanceToTop && distanceToRight < distanceToBottom) {
             cellCoords.x += 1;
             this.notebook.addStroke(cellCoords, 'left');
             this.currentCell.strokeType = 'left';
-        } else if (distanceToBottom <= __WEBPACK_IMPORTED_MODULE_0__consts__["k" /* DIVIATION */] && distanceToBottom <= distanceToRight && distanceToBottom < distanceToLeft) {
+        } else if (distanceToBottom <= __WEBPACK_IMPORTED_MODULE_0__consts__["l" /* DIVIATION */] && distanceToBottom <= distanceToRight && distanceToBottom < distanceToLeft) {
             cellCoords.y += 1;
             this.notebook.addStroke(cellCoords, 'top');
             this.currentCell.strokeType = 'top';
-        } else if (distanceToLeft <= __WEBPACK_IMPORTED_MODULE_0__consts__["k" /* DIVIATION */] && distanceToLeft <= distanceToBottom && distanceToLeft < distanceToTop) {
+        } else if (distanceToLeft <= __WEBPACK_IMPORTED_MODULE_0__consts__["l" /* DIVIATION */] && distanceToLeft <= distanceToBottom && distanceToLeft < distanceToTop) {
             this.notebook.addStroke(cellCoords, 'left');
             this.currentCell.strokeType = 'left';
         } else {
@@ -326,12 +369,6 @@ class ActionsDrawMode {
 
             let cellCoords = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_utils__["b" /* getCellCoords */])(x, y);
             let cell = this.notebook.data[cellCoords.y][cellCoords.x];
-
-            // стираем всю клетку
-            if (event.altKey) {
-                this.notebook.removeCell(cellCoords);
-                return;
-            }
 
             switch (this.currentCell.strokeType) {
                 case 'top':
@@ -378,7 +415,7 @@ class ActionsDrawMode {
 ;
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -391,6 +428,7 @@ let pickAreaNode = document.querySelector('.js-pick-area');
 
 class ActionsPickMode {
     constructor() {
+        this.click = true;
         this.process = false;
         this.coordsClick = {};
         this.area = {};
@@ -399,6 +437,7 @@ class ActionsPickMode {
     mousedown(x, y, event) {
         event.preventDefault();
 
+        this.click = true;
         this.process = true;
 
         pickAreaNode.style.display = 'none';
@@ -419,7 +458,7 @@ class ActionsPickMode {
         this.area.y1 = cellCoords.y;
     }
 
-    mousemove(x, y) {
+    mousemove(x, y, event) {
         if (this.process) {
             let width = Math.abs(this.coordsClick.x - x);
             let height = Math.abs(this.coordsClick.y - y);
@@ -427,9 +466,9 @@ class ActionsPickMode {
             if (width < 5 && height < 5) {
                 return;
             }
+            this.click = false;
 
             pickAreaNode.style.display = 'block';
-
             pickAreaNode.style.width = width + 'px';
             pickAreaNode.style.height = height + 'px';
         }
@@ -450,10 +489,10 @@ class ActionsPickMode {
             y2: this.area.y2 - 1
         };
 
-        pickAreaNode.style.left = selectedArea.x1 * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
-        pickAreaNode.style.top = selectedArea.y1 * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
-        pickAreaNode.style.width = (selectedArea.x2 - selectedArea.x1 + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
-        pickAreaNode.style.height = (selectedArea.y2 - selectedArea.y1 + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["h" /* CELL_SIZE */] + 'px';
+        pickAreaNode.style.left = selectedArea.x1 * __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] + 'px';
+        pickAreaNode.style.top = selectedArea.y1 * __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] + 'px';
+        pickAreaNode.style.width = (selectedArea.x2 - selectedArea.x1 + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] + 'px';
+        pickAreaNode.style.height = (selectedArea.y2 - selectedArea.y1 + 1) * __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELL_SIZE */] + 'px';
         // Возвращаем координаты выделенной области
         return selectedArea;
     }
@@ -462,7 +501,7 @@ class ActionsPickMode {
 ;
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -496,20 +535,20 @@ class Notebook {
             y2: 0
         };
 
-        this.mode = __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* MODE_DRAW */];
+        this.mode = __WEBPACK_IMPORTED_MODULE_0__consts__["d" /* MODE_DRAW */];
 
         if (localStorage.getItem('notebookData')) {
             this.data = JSON.parse(localStorage.getItem('notebookData'));
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__draw__["c" /* redrawAll */])(this.data);
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__draw__["e" /* redrawAll */])(this.data);
         } else {
             this.createEmptyData();
         }
     }
 
     createEmptyData() {
-        for (let i = 0; i < __WEBPACK_IMPORTED_MODULE_0__consts__["i" /* CELLS_COUNT_BY_Y */]; i++) {
+        for (let i = 0; i < __WEBPACK_IMPORTED_MODULE_0__consts__["j" /* CELLS_COUNT_BY_Y */]; i++) {
             this.data[i] = [];
-            for (let j = 0; j < __WEBPACK_IMPORTED_MODULE_0__consts__["j" /* CELLS_COUNT_BY_X */]; j++) {
+            for (let j = 0; j < __WEBPACK_IMPORTED_MODULE_0__consts__["k" /* CELLS_COUNT_BY_X */]; j++) {
                 this.data[i][j] = new Cell();
             }
         }
@@ -526,7 +565,7 @@ class Notebook {
         if (!this.data[y][x][strokeType]) {
             this.data[y][x][strokeType] = true;
             this.syncWithStorage();
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__draw__["d" /* drawStroke */])(cellCoords, strokeType);
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__draw__["f" /* drawStroke */])(cellCoords, strokeType);
         }
     }
 
@@ -539,7 +578,7 @@ class Notebook {
         this.data[y][x + 1].left = null;
 
         this.syncWithStorage();
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__draw__["c" /* redrawAll */])(this.data);
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__draw__["e" /* redrawAll */])(this.data);
     }
 
     clearArea(selectedArea) {
@@ -569,7 +608,7 @@ class Notebook {
         }
 
         this.syncWithStorage();
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__draw__["c" /* redrawAll */])(this.data);
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__draw__["e" /* redrawAll */])(this.data);
     }
 
     copy() {
@@ -629,24 +668,26 @@ class Notebook {
             }
         }
         this.syncWithStorage();
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__draw__["c" /* redrawAll */])(this.data);
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__draw__["e" /* redrawAll */])(this.data);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Notebook;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__consts__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__models_notebook__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__models_notebook__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__draw__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__actions_drawMode__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__actions_pickMode__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__actions_drawMode__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__actions_clearMode__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__actions_pickMode__ = __webpack_require__(5);
+
 
 
 
@@ -665,13 +706,95 @@ let buttonSaveImage = document.querySelector('.js-save-image');
 
 let isPressedCtrl = false;
 
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__draw__["a" /* drawGrid */])();
-
 let notebook = new __WEBPACK_IMPORTED_MODULE_2__models_notebook__["a" /* default */]();
 let actionsDrawMode = new __WEBPACK_IMPORTED_MODULE_4__actions_drawMode__["a" /* default */](notebook);
-let actionsPickMode = new __WEBPACK_IMPORTED_MODULE_5__actions_pickMode__["a" /* default */](notebook);
+let actionsClearMode = new __WEBPACK_IMPORTED_MODULE_5__actions_clearMode__["a" /* default */](notebook);
+let actionsPickMode = new __WEBPACK_IMPORTED_MODULE_6__actions_pickMode__["a" /* default */](notebook);
 
 let canvasOffset = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_utils__["a" /* getOffset */])(canvas);
+__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__draw__["a" /* drawGrid */])();
+
+// выбор режима работы (рисование, выделение, стирание)
+controlsNode.addEventListener('click', function (event) {
+    let button = event.target;
+    let elementClasses = button.classList;
+
+    if (elementClasses.contains('js-mode')) {
+        let mode = button.getAttribute('data-mode');
+        let classPressed = 'button-control_pressed';
+
+        let prevActiveButton = controlsNode.querySelector('.' + classPressed);
+        prevActiveButton.classList.remove(classPressed);
+
+        elementClasses.add(classPressed);
+        notebook.mode = mode;
+
+        if (mode !== __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]) {
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__draw__["b" /* hideSelectedCells */])();
+        }
+    }
+});
+
+// выбор цвета линий
+controlColor.addEventListener('click', function (event) {
+    let button = event.target;
+    let elementClasses = button.classList;
+
+    if (elementClasses.contains('control-color')) {
+        let prevActiveButton = controlColor.querySelector('.current');
+        prevActiveButton.classList.remove('current');
+        elementClasses.add('current');
+
+        let color = button.style.backgroundColor;
+        ctx.strokeStyle = color;
+    }
+});
+
+// Стереть все
+buttonClearAll.addEventListener('click', function () {
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__draw__["c" /* clearAll */])();
+    localStorage.clear();
+    notebook.createEmptyData();
+});
+
+// Сохранить картинку
+buttonSaveImage.addEventListener('click', function () {
+    let dataURL = canvas.toDataURL();
+    window.open(dataURL);
+});
+
+// Горячие клавиши (CTRL+C, CTRL+V, CTRL+X, ALT - режим стирания)
+document.addEventListener('keydown', function (event) {
+    if (notebook.mode === __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]) {
+        if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* KEY_CODES */].ctrl || event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* KEY_CODES */].cmd) {
+            isPressedCtrl = true;
+        }
+
+        if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* KEY_CODES */].alt) {
+            notebook.mode = __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* MODE_CLEAR */];
+        }
+
+        if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* KEY_CODES */].c) {
+            notebook.copy();
+        }
+        if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* KEY_CODES */].x) {
+            notebook.cut();
+        }
+        if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* KEY_CODES */].v) {
+            notebook.paste();
+        }
+    }
+});
+
+document.addEventListener('keyup', function (event) {
+    if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* KEY_CODES */].ctrl || event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* KEY_CODES */].cmd) {
+        isPressedCtrl = false;
+    }
+
+    if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* KEY_CODES */].alt) {
+        notebook.mode = __WEBPACK_IMPORTED_MODULE_0__consts__["d" /* MODE_DRAW */];
+    }
+});
 
 canvas.addEventListener('click', function (event) {
     let x = event.pageX - canvasOffset.left;
@@ -681,11 +804,13 @@ canvas.addEventListener('click', function (event) {
 
     switch (notebook.mode) {
         case __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]:
-            notebook.targetCell = {
-                x: cellCoords.x,
-                y: cellCoords.y
-            };
-            //selectCell(cellCoords);
+            if (actionsPickMode.click) {
+                notebook.targetCell = {
+                    x: cellCoords.x,
+                    y: cellCoords.y
+                };
+                __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__draw__["d" /* selectCell */])(cellCoords);
+            }
             break;
         default:
             break;
@@ -697,8 +822,11 @@ canvas.addEventListener('mousedown', function (event) {
     let y = event.pageY - canvasOffset.top;
 
     switch (notebook.mode) {
-        case __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* MODE_DRAW */]:
+        case __WEBPACK_IMPORTED_MODULE_0__consts__["d" /* MODE_DRAW */]:
             actionsDrawMode.mousedown(x, y, event);
+            break;
+        case __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* MODE_CLEAR */]:
+            actionsClearMode.mousedown(x, y, event);
             break;
         case __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]:
             actionsPickMode.mousedown(x, y, event);
@@ -713,8 +841,11 @@ canvas.addEventListener('mousemove', function (event) {
     let y = event.pageY - canvasOffset.top;
 
     switch (notebook.mode) {
-        case __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* MODE_DRAW */]:
+        case __WEBPACK_IMPORTED_MODULE_0__consts__["d" /* MODE_DRAW */]:
             actionsDrawMode.mousemove(x, y, event);
+            break;
+        case __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* MODE_CLEAR */]:
+            actionsClearMode.mousemove(x, y, event);
             break;
         case __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]:
             actionsPickMode.mousemove(x, y, event);
@@ -729,82 +860,17 @@ document.addEventListener('mouseup', function (event) {
     let y = event.pageY - canvasOffset.top;
 
     switch (notebook.mode) {
-        case __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* MODE_DRAW */]:
+        case __WEBPACK_IMPORTED_MODULE_0__consts__["d" /* MODE_DRAW */]:
             actionsDrawMode.mouseup();
+            break;
+        case __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* MODE_CLEAR */]:
+            actionsClearMode.mouseup();
             break;
         case __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]:
             notebook.selectedArea = actionsPickMode.mouseup(x, y, event);
             break;
         default:
             break;
-    }
-});
-
-controlsNode.addEventListener('click', function (event) {
-    let elementClasses = event.target.classList;
-
-    if (elementClasses.contains('js-mode')) {
-        let button = event.target;
-        let mode = button.getAttribute('data-mode');
-        let classPressed = 'button-control_pressed';
-
-        if (elementClasses.contains(classPressed)) {
-            elementClasses.remove(classPressed);
-            notebook.mode = __WEBPACK_IMPORTED_MODULE_0__consts__["b" /* MODE_DRAW */];
-        } else {
-            elementClasses.add(classPressed);
-            notebook.mode = mode;
-        }
-    }
-});
-
-controlColor.addEventListener('click', function (event) {
-    let elementClasses = event.target.classList;
-
-    if (elementClasses.contains('control-color')) {
-        let prevActiveButton = controlColor.querySelector('.current');
-        prevActiveButton.classList.remove('current');
-
-        let button = event.target;
-        let color = button.style.backgroundColor;
-
-        elementClasses.add('current');
-        ctx.strokeStyle = color;
-    }
-});
-
-buttonClearAll.addEventListener('click', function () {
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__draw__["b" /* clearAll */])();
-    localStorage.clear();
-    notebook.createEmptyData();
-});
-
-buttonSaveImage.addEventListener('click', function () {
-    let dataURL = canvas.toDataURL();
-    window.open(dataURL);
-});
-
-document.addEventListener('keydown', function (event) {
-    if (notebook.mode === __WEBPACK_IMPORTED_MODULE_0__consts__["a" /* MODE_PICK */]) {
-        if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* KEY_CODES */].ctrl || event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* KEY_CODES */].cmd) {
-            isPressedCtrl = true;
-        }
-
-        if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* KEY_CODES */].c) {
-            notebook.copy();
-        }
-        if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* KEY_CODES */].x) {
-            notebook.cut();
-        }
-        if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* KEY_CODES */].v) {
-            notebook.paste();
-        }
-    }
-});
-
-document.addEventListener('keyup', function (event) {
-    if (event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* KEY_CODES */].ctrl || event.keyCode === __WEBPACK_IMPORTED_MODULE_0__consts__["c" /* KEY_CODES */].cmd) {
-        isPressedCtrl = false;
     }
 });
 
